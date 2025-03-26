@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login.dart'; // นำเข้า LoginPage สำหรับกลับไปที่หน้า Login
 import 'forum.dart'; // นำเข้า ForumPage
+import '../Valorant_database/valorant_database.dart'; // นำเข้า ValorantDatabasePage (สมมติว่าหน้านี้คือหน้า Valorant Database)
 
 class HomePage extends StatelessWidget {
   final dynamic user; // รับข้อมูลผู้ใช้จากหน้า Login
@@ -40,6 +41,20 @@ class HomePage extends StatelessWidget {
                 );
               },
               child: Text('Go to Forum'),
+            ),
+            SizedBox(height: 20),
+            // ปุ่มไปที่หน้า Valorant Database
+            ElevatedButton(
+              onPressed: () {
+                // ไปที่หน้า Valorant Database โดยไม่ต้องส่งข้อมูล user
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ValorantDatabasePage(),
+                  ),
+                );
+              },
+              child: Text('Valorant Database'),
             ),
           ],
         ),

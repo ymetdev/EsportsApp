@@ -98,20 +98,46 @@ class _ForumPageState extends State<ForumPage> {
   }
 
   Future<void> deleteTopic(int topicId) async {
-    final response = await http.delete(
-      Uri.parse('http://localhost:3000/topics/$topicId'),
-    );
+    // แสดง Dialog เพื่อยืนยันการลบ
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this topic?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // ปิด Dialog และไม่ลบ
+                Navigator.pop(context);
+              },
+              child: Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                // ทำการลบโพสต์
+                final response = await http.delete(
+                  Uri.parse('http://localhost:3000/topics/$topicId'),
+                );
 
-    if (response.statusCode == 200) {
-      fetchTopics(); // รีเฟรชโพสต์
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Successfully deleted!")));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Deletion failed!")));
-    }
+                if (response.statusCode == 200) {
+                  fetchTopics(); // รีเฟรชโพสต์
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Successfully deleted!")),
+                  );
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("Deletion failed!")));
+                }
+                Navigator.pop(context); // ปิด Dialog หลังจากลบ
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void showEditDialog(int topicId, String currentTitle, String currentContent) {
@@ -224,16 +250,38 @@ class _ForumPageState extends State<ForumPage> {
 
           return Card(
             child: Container(
-              height: 100, // กำหนดความสูงที่ต้องการให้แต่ละรายการใน ListView
               child: ListTile(
-                title: Text(topic['title']),
+                title: Text(
+                  topic['title'],
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, // ทำให้ข้อความตัวหนา
+                  ),
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(topic['content']),
-                    Text(
-                      'Posted by: $username', // Show username
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 8.0,
+                      ), // กำหนด margin ด้านบน
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'Posted by ', // ข้อความแรกที่เป็นสีเทา
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text:
+                                  '@$username', // ข้อความ username ที่เป็นสี Deep Purple
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -254,25 +302,31 @@ class _ForumPageState extends State<ForumPage> {
                 },
                 trailing:
                     widget.user['_id'] == topic['userId']
-                        ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit, color: Colors.blue),
-                              onPressed:
-                                  () => showEditDialog(
-                                    topic['_id'],
-                                    topic['title'],
-                                    topic['content'],
-                                  ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                deleteTopic(topic['_id']); // Delete topic
-                              },
-                            ),
-                          ],
+                        ? PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert),
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              showEditDialog(
+                                topic['_id'],
+                                topic['title'],
+                                topic['content'],
+                              );
+                            } else if (value == 'delete') {
+                              deleteTopic(topic['_id']); // Delete topic
+                            }
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return [
+                              PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                            ];
+                          },
                         )
                         : null,
               ),
