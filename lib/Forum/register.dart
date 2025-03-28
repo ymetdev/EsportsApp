@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'login.dart'; // นำเข้าหน้า Login
 
 class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -47,9 +49,18 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // ตั้งค่าตัวอักษรเริ่มต้นชิดซ้าย
           children: <Widget>[
+            // เพิ่มการแสดงโลโก้ที่ด้านบน
+            Align(
+              alignment: Alignment.topCenter, // ตั้งโลโก้ให้ชิดด้านบน
+              child: Image.asset(
+                'icon.png',
+                height: 250, // ปรับขนาดโลโก้ตามต้องการ
+              ),
+            ),
+
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(labelText: 'Username'),

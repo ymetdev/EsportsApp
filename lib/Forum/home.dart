@@ -1,12 +1,34 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // นำเข้า LoginPage สำหรับกลับไปที่หน้า Login
-import 'forum.dart'; // นำเข้า ForumPage
-import '../Valorant_database/valorant_database.dart'; // นำเข้า ValorantDatabasePage (สมมติว่าหน้านี้คือหน้า Valorant Database)
+import 'dart:math';
+import 'login.dart';
+import 'forum.dart';
+import '../Valorant_database/valorant_database.dart';
+
+List<String> emojis = [
+  '✿',
+  '♠',
+  '♡',
+  '☕︎',
+  '🕷',
+  '🗿',
+  '🌟',
+  '💎',
+  '🔥',
+  '🌸',
+  '⚡',
+  '💖',
+  '🎉',
+  '💀',
+];
+String getRandomEmoji() {
+  final random = Random();
+  return emojis[random.nextInt(emojis.length)];
+}
 
 class HomePage extends StatelessWidget {
-  final dynamic user; // รับข้อมูลผู้ใช้จากหน้า Login
+  final dynamic user;
 
-  HomePage({required this.user}); // Constructor เพื่อรับข้อมูลผู้ใช้
+  const HomePage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +36,6 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Home'),
         actions: [
-          // ปุ่ม Logout ใน AppBar
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
@@ -25,36 +46,32 @@ class HomePage extends StatelessWidget {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start, // ให้เนื้อหาอยู่ด้านบน
           children: [
-            Text('Welcome, ${user['username']}!'), // แสดงชื่อผู้ใช้ที่ login
-            SizedBox(height: 20),
-            // ปุ่มไปที่หน้า Forum
-            ElevatedButton(
-              onPressed: () {
-                // ส่ง user ไปที่ ForumPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ForumPage(user: user),
-                  ),
-                );
-              },
-              child: Text('Go to Forum'),
+            SizedBox(height: 100), // ดันขึ้นไปให้สูงขึ้น
+            Text(
+              'Welcome, ${user['username']} ${getRandomEmoji()}',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
             ),
-            SizedBox(height: 20),
-            // ปุ่มไปที่หน้า Valorant Database
-            ElevatedButton(
-              onPressed: () {
-                // ไปที่หน้า Valorant Database โดยไม่ต้องส่งข้อมูล user
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ValorantDatabasePage(),
-                  ),
-                );
-              },
-              child: Text('Valorant Database'),
+            SizedBox(height: 5),
+            Text(
+              'Press "Forum" to see what others are talking about, and press "Database" to view information about Valorant.',
+              style: TextStyle(fontSize: 15, color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+
+            SizedBox(height: 40), // เว้นระยะห่างก่อนปุ่ม
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildSquareButton(context, 'Forum', ForumPage(user: user)),
+                SizedBox(width: 20),
+                _buildSquareButton(context, 'Database', ValorantDatabasePage()),
+              ],
             ),
           ],
         ),
@@ -62,7 +79,31 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ฟังก์ชันแสดงกล่องยืนยันการออกจากระบบ
+  // ฟังก์ชันสร้างปุ่มสี่เหลี่ยมจตุรัส
+  Widget _buildSquareButton(BuildContext context, String text, Widget page) {
+    return SizedBox(
+      width: 150, // กำหนดให้ปุ่มเป็นสี่เหลี่ยมจตุรัส
+      height: 150,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // ทำให้มุมโค้งเล็กน้อย
+          ),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
       context: context,
@@ -73,14 +114,13 @@ class HomePage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // ปิดกล่อง
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                // กลับไปที่หน้า Login
-                Navigator.of(context).pop(); // ปิดกล่อง
+                Navigator.of(context).pop();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),

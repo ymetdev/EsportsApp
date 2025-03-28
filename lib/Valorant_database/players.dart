@@ -6,14 +6,14 @@ import 'package:url_launcher/url_launcher.dart';
 class PlayersPage extends StatefulWidget {
   final List<dynamic> players;
 
-  PlayersPage({required this.players});
+  const PlayersPage({super.key, required this.players});
 
   @override
   _PlayersPageState createState() => _PlayersPageState();
 }
 
 class _PlayersPageState extends State<PlayersPage> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<dynamic> _filteredPlayers = [];
 
   @override
@@ -106,8 +106,7 @@ class _PlayersPageState extends State<PlayersPage> {
                                 } else if (snapshot.hasData &&
                                     snapshot.data != null) {
                                   return Image.network(
-                                    'https://cors-anywhere.herokuapp.com/' +
-                                        snapshot.data!,
+                                    'https://cors-anywhere.herokuapp.com/${snapshot.data!}',
                                     width: 50,
                                     height: 50,
                                   );
@@ -157,7 +156,7 @@ class _PlayersPageState extends State<PlayersPage> {
 class PlayerDetailPage extends StatelessWidget {
   final Map<String, dynamic> playerDetails;
 
-  PlayerDetailPage({required this.playerDetails});
+  const PlayerDetailPage({super.key, required this.playerDetails});
 
   @override
   Widget build(BuildContext context) {

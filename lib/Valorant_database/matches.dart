@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MatchesPage extends StatelessWidget {
   final List<dynamic> matches;
 
-  MatchesPage({required this.matches});
+  const MatchesPage({super.key, required this.matches});
 
   @override
   Widget build(BuildContext context) {

@@ -6,6 +6,8 @@ import 'players.dart';
 import 'matches.dart';
 
 class ValorantDatabasePage extends StatefulWidget {
+  const ValorantDatabasePage({super.key});
+
   @override
   _ValorantDatabasePageState createState() => _ValorantDatabasePageState();
 }

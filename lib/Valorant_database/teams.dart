@@ -5,14 +5,14 @@ import 'dart:convert';
 class TeamsPage extends StatefulWidget {
   final List<dynamic> teams;
 
-  TeamsPage({required this.teams});
+  const TeamsPage({super.key, required this.teams});
 
   @override
   _TeamsPageState createState() => _TeamsPageState();
 }
 
 class _TeamsPageState extends State<TeamsPage> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<dynamic> _filteredTeams = [];
 
   @override
@@ -106,7 +106,7 @@ class _TeamsPageState extends State<TeamsPage> {
 class TeamDetailPage extends StatefulWidget {
   final String teamId;
 
-  TeamDetailPage({required this.teamId});
+  const TeamDetailPage({super.key, required this.teamId});
 
   @override
   _TeamDetailPageState createState() => _TeamDetailPageState();

@@ -5,6 +5,8 @@ import 'home.dart'; // นำเข้า HomePage ที่จะไปหล�
 import 'register.dart'; // นำเข้าหน้า Register
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -46,8 +48,18 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // เปลี่ยนให้ข้อความและโลโก้ชิดซ้าย
           children: <Widget>[
+            // เพิ่มการแสดงโลโก้ที่ด้านบน
+            Align(
+              alignment: Alignment.topCenter, // ตั้งโลโก้ให้ชิดด้านบน
+              child: Image.asset(
+                'icon.png',
+                height: 250, // ปรับขนาดโลโก้ตามต้องการ
+              ),
+            ),
+
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(labelText: 'Username'),

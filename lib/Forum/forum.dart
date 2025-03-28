@@ -6,7 +6,7 @@ import 'topic_details.dart'; // นำเข้าหน้ารายละเ
 class ForumPage extends StatefulWidget {
   final dynamic user; // User data
 
-  ForumPage({required this.user});
+  const ForumPage({super.key, required this.user});
 
   @override
   _ForumPageState createState() => _ForumPageState();
