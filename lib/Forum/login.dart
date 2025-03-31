@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home.dart'; // นำเข้า HomePage ที่จะไปหลังจาก Login สำเร็จ
 import 'register.dart'; // นำเข้าหน้า Register
+import '../custom_page_route.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,9 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       final responseData = json.decode(response.body);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(user: responseData['user']),
-        ),
+        CustomPageRoute(page: HomePage(user: responseData['user'])),
       );
     } else {
       ScaffoldMessenger.of(
@@ -75,10 +74,7 @@ class _LoginPageState extends State<LoginPage> {
             TextButton(
               onPressed: () {
                 // ไปหน้า Register
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterPage()),
-                );
+                Navigator.push(context, CustomPageRoute(page: RegisterPage()));
               },
               child: Text('Don\'t have an account? Register here'),
             ),

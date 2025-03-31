@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'topic_details.dart'; // นำเข้าหน้ารายละเอียด
+import '../custom_page_route.dart';
 
 class ForumPage extends StatefulWidget {
   final dynamic user; // User data
@@ -286,17 +287,14 @@ class _ForumPageState extends State<ForumPage> {
                   ],
                 ),
                 onTap: () {
-                  // Navigate to topic details page
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => TopicDetailsPage(
-                            topic: topic,
-                            users: users,
-                            loggedInUser:
-                                widget.user, // ส่งข้อมูลผู้ใช้ที่ล็อกอินไปด้วย
-                          ),
+                    CustomPageRoute(
+                      page: TopicDetailsPage(
+                        topic: topic,
+                        users: users,
+                        loggedInUser: widget.user,
+                      ),
                     ),
                   );
                 },
