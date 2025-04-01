@@ -9,8 +9,7 @@ class TopicDetailsPage extends StatefulWidget {
   final List<dynamic> users; // รับข้อมูล users
   final dynamic loggedInUser; // รับข้อมูลผู้ใช้ที่ล็อกอิน
 
-  const TopicDetailsPage({
-    super.key,
+  TopicDetailsPage({
     required this.topic,
     required this.users,
     required this.loggedInUser,
@@ -24,7 +23,6 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
   late List<dynamic> comments = [];
   final TextEditingController contentController =
       TextEditingController(); // สร้าง TextEditingController
-  bool isLoading = true; // เพิ่มตัวแปรนี้
 
   @override
   void initState() {
@@ -34,9 +32,6 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
 
   // ฟังก์ชันดึงความคิดเห็นจาก API
   Future<void> fetchComments() async {
-    setState(() {
-      isLoading = true; // เริ่มโหลดข้อมูล
-    });
     final response = await http.get(
       Uri.parse(
         'http://localhost:3000/comments?topicId=${widget.topic['_id']}',
@@ -47,10 +42,8 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
       final data = json.decode(response.body);
       setState(() {
         comments = data;
-        isLoading = false; // โหลดเสร็จแล้ว
       });
     } else {
-      isLoading = false; // โหลดไม่สำเร็จ แต่ให้จบการโหลด
       throw Exception('Failed to load comments');
     }
   }
@@ -78,38 +71,6 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
     }
   }
 
-  void _showEditCommentDialog(dynamic comment) {
-    TextEditingController editController = TextEditingController(
-      text: comment['content'],
-    );
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Edit Comment'),
-          content: TextField(
-            controller: editController,
-            decoration: InputDecoration(hintText: 'Enter new comment'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                editComment(comment['_id'], editController.text);
-                Navigator.pop(context);
-              },
-              child: Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   // ฟังก์ชันแก้ไขความคิดเห็น
   Future<void> editComment(int commentId, String newContent) async {
     final response = await http.put(
@@ -120,21 +81,9 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
 
     if (response.statusCode == 200) {
       fetchComments();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Comment successfully updated!"),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      print("Comment successfully updated!");
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Failed to update comment."),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      print("Failed to update comment.");
     }
   }
 
@@ -182,15 +131,12 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                 SizedBox(height: 16),
                 RichText(
                   text: TextSpan(
-                    text: 'Posted by ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    text: 'Posted by ', // ข้อความแรกที่เป็นสีเทา
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                     children: <TextSpan>[
                       TextSpan(
-                        text: '@$username',
+                        text:
+                            '@$username', // ข้อความ username ที่เป็นสี Deep Purple
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -200,145 +146,189 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                     ],
                   ),
                 ),
-
+                SizedBox(height: 8),
                 Text(
-                  timeago.format(
-                    DateTime.parse(widget.topic['createdAt']),
-                    locale: 'en',
-                  ),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black45,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  '${timeago.format(DateTime.parse(widget.topic['createdAt']), locale: 'en')}',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 16),
 
-                // โหลดเสร็จก่อนค่อยแสดงคอมเมนต์
-                isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${comments.length} Comments',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        comments.isEmpty
-                            ? Center(child: Text('No comments yet.'))
-                            : SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.5,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: comments.length,
-                                itemBuilder: (context, index) {
-                                  var comment = comments[index];
-                                  String commenterUsername = getUsernameById(
-                                    comment['userId'],
-                                  );
+                // แสดงจำนวนคอมเมนต์
+                Text(
+                  '${comments.length} Comments',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 10.0,
-                                    ), // เพิ่มช่องว่างด้านล่าง
-                                    child: Card(
-                                      elevation: 2,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: ListTile(
-                                          title: Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 4.0,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                RichText(
-                                                  text: TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '@$commenterUsername ',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color:
-                                                              Colors.deepPurple,
-                                                          fontSize: 16,
+                comments.isEmpty
+                    ? Center(child: Text('No comments yet.'))
+                    : Container(
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: comments.length,
+                        itemBuilder: (context, index) {
+                          var comment = comments[index];
+                          String commenterUsername = getUsernameById(
+                            comment['userId'],
+                          );
+
+                          return Card(
+                            elevation: 2, // เพิ่มเงา (4 คือระดับความเข้มของเงา)
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                12,
+                              ), // ทำให้มุมโค้งมน
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                8.0,
+                              ), // เพิ่มระยะห่างข้างใน
+                              child: ListTile(
+                                title: Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 4.0,
+                                  ), // เพิ่ม padding ด้านล่าง
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '@$commenterUsername ',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.deepPurple,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              timeago.format(
+                                                        DateTime.parse(
+                                                          comment['createdAt'],
                                                         ),
+                                                        locale: 'en_short',
+                                                      ) ==
+                                                      'now'
+                                                  ? 'Now'
+                                                  : '${timeago.format(DateTime.parse(comment['createdAt']), locale: 'en_short')} ago',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                subtitle: Text(comment['content']),
+                                trailing:
+                                    widget.loggedInUser['_id'] ==
+                                            comment['userId']
+                                        ? PopupMenuButton<String>(
+                                          icon: Icon(Icons.more_vert),
+                                          onSelected: (value) {
+                                            if (value == 'edit') {
+                                              TextEditingController
+                                              contentController =
+                                                  TextEditingController(
+                                                    text: comment['content'],
+                                                  );
+
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: Text('Edit Comment'),
+                                                    content: TextField(
+                                                      controller:
+                                                          contentController,
+                                                      decoration:
+                                                          InputDecoration(
+                                                            labelText:
+                                                                "Content",
+                                                          ),
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                            ),
+                                                        child: Text("Cancel"),
                                                       ),
-                                                      TextSpan(
-                                                        text:
-                                                            timeago.format(
-                                                                      DateTime.parse(
-                                                                        comment['createdAt'],
-                                                                      ),
-                                                                      locale:
-                                                                          'en_short',
-                                                                    ) ==
-                                                                    'now'
-                                                                ? 'Now'
-                                                                : '${timeago.format(DateTime.parse(comment['createdAt']), locale: 'en_short')} ago',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                          color: Colors.grey,
-                                                          fontSize: 14,
-                                                        ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          editComment(
+                                                            comment['_id'],
+                                                            contentController
+                                                                .text,
+                                                          );
+                                                          Navigator.pop(
+                                                            context,
+                                                          );
+                                                        },
+                                                        child: Text("Save"),
                                                       ),
                                                     ],
-                                                  ),
-                                                ),
-                                                if (comment['userId'] ==
-                                                    widget.loggedInUser['_id'])
-                                                  PopupMenuButton<String>(
-                                                    onSelected: (value) {
-                                                      if (value == 'edit') {
-                                                        _showEditCommentDialog(
-                                                          comment,
-                                                        );
-                                                      } else if (value ==
-                                                          'delete') {
-                                                        deleteComment(
-                                                          comment['_id'],
-                                                        );
-                                                      }
-                                                    },
-                                                    itemBuilder:
-                                                        (context) => [
-                                                          PopupMenuItem(
-                                                            value: 'edit',
-                                                            child: Text('Edit'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: 'delete',
-                                                            child: Text(
-                                                              'Delete',
+                                                  );
+                                                },
+                                              );
+                                            } else if (value == 'delete') {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                      'Are you sure?',
+                                                    ),
+                                                    content: Text(
+                                                      'Do you really want to delete this comment?',
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
                                                             ),
-                                                          ),
-                                                        ],
-                                                  ),
+                                                        child: Text('Cancel'),
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          deleteComment(
+                                                            comment['_id'],
+                                                          );
+                                                          Navigator.pop(
+                                                            context,
+                                                          );
+                                                        },
+                                                        child: Text('Delete'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                          itemBuilder:
+                                              (context) => [
+                                                PopupMenuItem<String>(
+                                                  value: 'edit',
+                                                  child: Text('Edit'),
+                                                ),
+                                                PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: Text('Delete'),
+                                                ),
                                               ],
-                                            ),
-                                          ),
-                                          subtitle: Text(comment['content']),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                        )
+                                        : null,
                               ),
                             ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
               ],
             ),
@@ -348,10 +338,10 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
-                controller: contentController,
+                controller: contentController, // ใส่ controller สำหรับช่องกรอก
                 decoration: InputDecoration(
                   labelText: 'Add a comment',
-                  filled: true,
+                  filled: true, // เปิดใช้งานการเติมสีพื้นหลัง
                 ),
                 onSubmitted: (value) {
                   if (value.isNotEmpty) {

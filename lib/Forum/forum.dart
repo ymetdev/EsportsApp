@@ -256,8 +256,11 @@ class _ForumPageState extends State<ForumPage> {
             topic['userId'],
           ); // Get username from userId
 
-          return Card(
-            child: Container(
+          return Padding(
+            padding: const EdgeInsets.only(
+              bottom: 3.0,
+            ), // กำหนด margin ด้านล่าง
+            child: Card(
               child: ListTile(
                 title: Text(
                   topic['title'],
