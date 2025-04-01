@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'topic_details.dart'; // นำเข้าหน้ารายละเอียด
 import '../custom_page_route.dart';
 
+import 'package:timeago/timeago.dart' as timeago;
+
 class ForumPage extends StatefulWidget {
   final dynamic user; // User data
 
@@ -22,6 +24,11 @@ class _ForumPageState extends State<ForumPage> {
     super.initState();
     fetchTopics();
     fetchUsers(); // Fetch users data
+  }
+
+  String timeAgo(String dateString) {
+    DateTime date = DateTime.parse(dateString);
+    return timeago.format(date, locale: 'en'); // แสดงเวลาแบบ 2 hours ago
   }
 
   Future<void> fetchTopics() async {
@@ -255,7 +262,8 @@ class _ForumPageState extends State<ForumPage> {
                 title: Text(
                   topic['title'],
                   style: TextStyle(
-                    fontWeight: FontWeight.bold, // ทำให้ข้อความตัวหนา
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18, // ทำให้ข้อความตัวหนา
                   ),
                 ),
                 subtitle: Column(
@@ -268,18 +276,22 @@ class _ForumPageState extends State<ForumPage> {
                       ), // กำหนด margin ด้านบน
                       child: RichText(
                         text: TextSpan(
-                          text: 'Posted by ', // ข้อความแรกที่เป็นสีเทา
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
                           children: <TextSpan>[
                             TextSpan(
-                              text:
-                                  '@$username', // ข้อความ username ที่เป็นสี Deep Purple
+                              text: 'Posted by ',
+                            ), // ข้อความแรกที่เป็นสีเทา
+                            TextSpan(
+                              text: '@$username', // Username
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.deepPurple,
                               ),
                             ),
+                            TextSpan(
+                              text: ' • ${timeAgo(topic['createdAt'])}',
+                            ), // เวลาที่โพสต์
                           ],
                         ),
                       ),

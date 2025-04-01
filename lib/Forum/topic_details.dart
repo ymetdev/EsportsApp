@@ -78,6 +78,38 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
     }
   }
 
+  void _showEditCommentDialog(dynamic comment) {
+    TextEditingController editController = TextEditingController(
+      text: comment['content'],
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Comment'),
+          content: TextField(
+            controller: editController,
+            decoration: InputDecoration(hintText: 'Enter new comment'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                editComment(comment['_id'], editController.text);
+                Navigator.pop(context);
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // ฟังก์ชันแก้ไขความคิดเห็น
   Future<void> editComment(int commentId, String newContent) async {
     final response = await http.put(
@@ -88,9 +120,21 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
 
     if (response.statusCode == 200) {
       fetchComments();
-      print("Comment successfully updated!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Comment successfully updated!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
     } else {
-      print("Failed to update comment.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to update comment."),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -139,7 +183,11 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                 RichText(
                   text: TextSpan(
                     text: 'Posted by ',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
                     children: <TextSpan>[
                       TextSpan(
                         text: '@$username',
@@ -152,15 +200,19 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 8),
+
                 Text(
                   timeago.format(
                     DateTime.parse(widget.topic['createdAt']),
                     locale: 'en',
                   ),
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black45,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 20),
 
                 // โหลดเสร็จก่อนค่อยแสดงคอมเมนต์
                 isLoading
@@ -189,53 +241,97 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                     comment['userId'],
                                   );
 
-                                  return Card(
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ListTile(
-                                        title: Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 4.0,
-                                          ),
-                                          child: RichText(
-                                            text: TextSpan(
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: 10.0,
+                                    ), // เพิ่มช่องว่างด้านล่าง
+                                    child: Card(
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ListTile(
+                                          title: Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 4.0,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                TextSpan(
-                                                  text: '@$commenterUsername ',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.deepPurple,
-                                                    fontSize: 16,
+                                                RichText(
+                                                  text: TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            '@$commenterUsername ',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Colors.deepPurple,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            timeago.format(
+                                                                      DateTime.parse(
+                                                                        comment['createdAt'],
+                                                                      ),
+                                                                      locale:
+                                                                          'en_short',
+                                                                    ) ==
+                                                                    'now'
+                                                                ? 'Now'
+                                                                : '${timeago.format(DateTime.parse(comment['createdAt']), locale: 'en_short')} ago',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          color: Colors.grey,
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                TextSpan(
-                                                  text:
-                                                      timeago.format(
-                                                                DateTime.parse(
-                                                                  comment['createdAt'],
-                                                                ),
-                                                                locale:
-                                                                    'en_short',
-                                                              ) ==
-                                                              'now'
-                                                          ? 'Now'
-                                                          : '${timeago.format(DateTime.parse(comment['createdAt']), locale: 'en_short')} ago',
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
+                                                if (comment['userId'] ==
+                                                    widget.loggedInUser['_id'])
+                                                  PopupMenuButton<String>(
+                                                    onSelected: (value) {
+                                                      if (value == 'edit') {
+                                                        _showEditCommentDialog(
+                                                          comment,
+                                                        );
+                                                      } else if (value ==
+                                                          'delete') {
+                                                        deleteComment(
+                                                          comment['_id'],
+                                                        );
+                                                      }
+                                                    },
+                                                    itemBuilder:
+                                                        (context) => [
+                                                          PopupMenuItem(
+                                                            value: 'edit',
+                                                            child: Text('Edit'),
+                                                          ),
+                                                          PopupMenuItem(
+                                                            value: 'delete',
+                                                            child: Text(
+                                                              'Delete',
+                                                            ),
+                                                          ),
+                                                        ],
                                                   ),
-                                                ),
                                               ],
                                             ),
                                           ),
+                                          subtitle: Text(comment['content']),
                                         ),
-                                        subtitle: Text(comment['content']),
                                       ),
                                     ),
                                   );
@@ -244,7 +340,6 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                             ),
                       ],
                     ),
-                SizedBox(height: 16),
               ],
             ),
           ),
