@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import '../custom_page_route.dart';
 
 class PlayersPage extends StatefulWidget {
   final List<dynamic> players;
@@ -66,17 +67,29 @@ class _PlayersPageState extends State<PlayersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Players List')),
+      backgroundColor: Color(0xFF101010),
+      appBar: AppBar(
+        title: Text('Players List'),
+        backgroundColor: Color(0xFFA12C2C),
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         children: [
           Padding(
             padding: EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
+              style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Search Player',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white54),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFA12C2C)),
+                ),
+                prefixIcon: Icon(Icons.search, color: Colors.white70),
               ),
               onChanged: _filterPlayers,
             ),
@@ -84,14 +97,20 @@ class _PlayersPageState extends State<PlayersPage> {
           Expanded(
             child:
                 _filteredPlayers.isEmpty
-                    ? Center(child: Text('No players available'))
+                    ? Center(
+                      child: Text(
+                        'No players available',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
                     : ListView.builder(
                       itemCount: _filteredPlayers.length,
                       itemBuilder: (context, index) {
                         final player = _filteredPlayers[index];
-                        final playerId = player['id'].toString(); // ID ผู้เล่น
+                        final playerId = player['id'].toString();
 
                         return Card(
+                          color: Color(0xFF181818),
                           margin: EdgeInsets.symmetric(
                             vertical: 8,
                             horizontal: 16,
@@ -102,7 +121,9 @@ class _PlayersPageState extends State<PlayersPage> {
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return CircularProgressIndicator(); // แสดงโหลด
+                                  return CircularProgressIndicator(
+                                    color: Color(0xFFA12C2C),
+                                  );
                                 } else if (snapshot.hasData &&
                                     snapshot.data != null) {
                                   return Image.network(
@@ -114,17 +135,22 @@ class _PlayersPageState extends State<PlayersPage> {
                                   return Icon(
                                     Icons.person,
                                     size: 50,
-                                  ); // ไม่มีรูป
+                                    color: Colors.white70,
+                                  );
                                 }
                               },
                             ),
                             title: Text(
                               player['name'] ?? 'Unknown Player',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFFFFFFF),
+                              ),
                             ),
                             subtitle: Text(
                               'Team: ${player['teamTag'] ?? 'N/A'}\n'
                               'Country: ${player['country']?.toUpperCase() ?? 'Unknown'}',
+                              style: TextStyle(color: Colors.white70),
                             ),
                             onTap: () async {
                               final playerDetails = await _fetchPlayerDetails(
@@ -133,11 +159,10 @@ class _PlayersPageState extends State<PlayersPage> {
                               if (playerDetails != null) {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => PlayerDetailPage(
-                                          playerDetails: playerDetails,
-                                        ),
+                                  CustomPageRoute(
+                                    page: PlayerDetailPage(
+                                      playerDetails: playerDetails,
+                                    ),
                                   ),
                                 );
                               }
@@ -164,62 +189,55 @@ class PlayerDetailPage extends StatelessWidget {
     final teamInfo = playerDetails['team'];
 
     return Scaffold(
-      appBar: AppBar(title: Text(playerInfo['name'])),
+      backgroundColor: Color(0xFF101010),
+      appBar: AppBar(
+        title: Text(playerInfo['name']),
+        backgroundColor: Color(0xFFA12C2C),
+        foregroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // จัดแนวตั้ง
-            crossAxisAlignment: CrossAxisAlignment.center, // จัดแนวนอน
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // รูปภาพของผู้เล่น
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Center(
-                  child: Image.network(
-                    'https://cors-anywhere.herokuapp.com/' + playerInfo['img'],
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
+                child: Image.network(
+                  'https://cors-anywhere.herokuapp.com/' + playerInfo['img'],
+                  height: 200,
+                  fit: BoxFit.cover,
                 ),
               ),
               SizedBox(height: 24),
-
-              // ชื่อผู้เล่น
               Text(
                 playerInfo['user'],
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 8),
               Text(
                 'Name: ${playerInfo['name']}',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 16, color: Colors.white70),
               ),
               SizedBox(height: 8),
-              // ประเทศของผู้เล่น
               Text(
                 'Country: ${playerInfo['country']}',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 16, color: Colors.white70),
               ),
               SizedBox(height: 24),
-
-              // ชื่อทีมและโลโก้ของทีมในบรรทัดเดียวกัน
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // จัดแนวนอนให้ข้อมูลตรงกลาง
-                crossAxisAlignment:
-                    CrossAxisAlignment.center, // จัดให้โลโก้ทีมอยู่กลาง
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Team: ${teamInfo['name']}',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                   ),
                   SizedBox(width: 8),
@@ -235,15 +253,10 @@ class PlayerDetailPage extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16),
-
-              // URL ของทีม
               ElevatedButton(
-                onPressed: () {
-                  // เปิดลิงก์ทีมในเบราว์เซอร์
-                  launch(teamInfo['url']);
-                },
+                onPressed: () => launch(teamInfo['url']),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: Color(0xFFA12C2C),
                 ),
                 child: Text(
                   'Visit Team Website',
@@ -251,15 +264,10 @@ class PlayerDetailPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16),
-
-              // URL ของผู้เล่น
               ElevatedButton(
-                onPressed: () {
-                  // เปิดลิงก์ผู้เล่นในเบราว์เซอร์
-                  launch(playerInfo['url']);
-                },
+                onPressed: () => launch(playerInfo['url']),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: Color(0xFFA12C2C),
                 ),
                 child: Text(
                   'Visit Player Website',

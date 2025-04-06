@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'topic_details.dart'; // นำเข้าหน้ารายละเอียด
 import '../custom_page_route.dart';
-
 import 'package:timeago/timeago.dart' as timeago;
 
 class ForumPage extends StatefulWidget {
@@ -18,12 +17,33 @@ class ForumPage extends StatefulWidget {
 class _ForumPageState extends State<ForumPage> {
   List<dynamic> topics = [];
   List<dynamic> users = []; // List to store users
+  TextEditingController _searchController =
+      TextEditingController(); // ควบคุมการพิมพ์ในช่องค้นหา
+  List<dynamic> filteredTopics = []; // เก็บผลลัพธ์ที่ค้นหาจากข้อความ
 
   @override
   void initState() {
     super.initState();
-    fetchTopics();
     fetchUsers(); // Fetch users data
+    fetchTopics();
+  }
+
+  void _searchTopics(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredTopics = topics;
+      });
+    } else {
+      setState(() {
+        filteredTopics =
+            topics.where((topic) {
+              return topic['title'].toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ||
+                  topic['content'].toLowerCase().contains(query.toLowerCase());
+            }).toList();
+      });
+    }
   }
 
   String timeAgo(String dateString) {
@@ -35,8 +55,10 @@ class _ForumPageState extends State<ForumPage> {
     final response = await http.get(Uri.parse('http://localhost:3000/topics'));
 
     if (response.statusCode == 200) {
+      final data = json.decode(response.body);
       setState(() {
-        topics = json.decode(response.body);
+        topics = data;
+        filteredTopics = data; // ⭐ เพิ่มบรรทัดนี้
       });
     }
   }
@@ -119,6 +141,9 @@ class _ForumPageState extends State<ForumPage> {
                 // ปิด Dialog และไม่ลบ
                 Navigator.pop(context);
               },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // เปลี่ยนพื้นหลังเป็นสีดำ
+              ),
               child: Text('No'),
             ),
             ElevatedButton(
@@ -140,6 +165,10 @@ class _ForumPageState extends State<ForumPage> {
                 }
                 Navigator.pop(context); // ปิด Dialog หลังจากลบ
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFA12C2C), // ใช้สีหลักจากธีมของแอป
+                foregroundColor: Colors.white, // สีตัวอักษรให้เป็นขาว
+              ),
               child: Text('Yes'),
             ),
           ],
@@ -178,6 +207,9 @@ class _ForumPageState extends State<ForumPage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text("Cancel"),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // พื้นหลังสีดำ
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -189,6 +221,10 @@ class _ForumPageState extends State<ForumPage> {
                 Navigator.pop(context);
               },
               child: Text("Save"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFA12C2C), // พื้นหลังสีแดง (สีหลัก)
+                foregroundColor: Colors.white, // ตัวอักษรเป็นสีขาว
+              ),
             ),
           ],
         );
@@ -222,6 +258,9 @@ class _ForumPageState extends State<ForumPage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text("Cancel"),
+              style: TextButton.styleFrom(
+                foregroundColor: Color(0xFF101010), // ตัวอักษรเป็นสีขาว
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -229,6 +268,12 @@ class _ForumPageState extends State<ForumPage> {
                 Navigator.pop(context);
               },
               child: Text("Create"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(
+                  0xFFA12C2C,
+                ), // พื้นหลังปุ่มเป็นสี primary
+                foregroundColor: Colors.white, // ตัวอักษรเป็นสีขาว
+              ),
             ),
           ],
         );
@@ -241,111 +286,188 @@ class _ForumPageState extends State<ForumPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Forum'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: showCreateTopicDialog, // เพิ่มปุ่มสร้างโพสต์ใหม่
-          ),
-        ],
+        foregroundColor: Colors.white,
+        backgroundColor: Color(0xFFA12C2C), // สีหลัก (primary)
       ),
-      body: ListView.builder(
-        itemCount: topics.length,
-        itemBuilder: (context, index) {
-          final topic = topics[index];
-          final username = getUsernameById(
-            topic['userId'],
-          ); // Get username from userId
-
-          return Padding(
-            padding: const EdgeInsets.only(
-              bottom: 3.0,
-            ), // กำหนด margin ด้านล่าง
-            child: Card(
-              child: ListTile(
-                title: Text(
-                  topic['title'],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18, // ทำให้ข้อความตัวหนา
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(topic['content']),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8.0,
-                      ), // กำหนด margin ด้านบน
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'Posted by ',
-                            ), // ข้อความแรกที่เป็นสีเทา
-                            TextSpan(
-                              text: '@$username', // Username
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                            TextSpan(
-                              text: ' • ${timeAgo(topic['createdAt'])}',
-                            ), // เวลาที่โพสต์
-                          ],
-                        ),
+      body: Container(
+        color: Color(0xFF101010), // สีพื้นหลัง (background)
+        child: Column(
+          children: [
+            // ช่องค้นหาที่อยู่ข้างบนก่อนการแสดงผลรายการ
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: double.infinity,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _searchTopics,
+                  cursorColor: Color(0xFFA12C2C), // สีแดงของ cursor
+                  decoration: InputDecoration(
+                    hintText: 'Search Topics',
+                    hintStyle: TextStyle(color: Colors.white),
+                    fillColor: Colors.white,
+                    filled: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 15,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Color(
+                          0xFFA12C2C,
+                        ), // สีแดงเข้มที่คุณใช้ใน username ก็ได้
+                        width: 2.0,
                       ),
                     ),
-                  ],
+                    prefixIcon: Icon(Icons.search, color: Colors.black),
+                  ),
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    CustomPageRoute(
-                      page: TopicDetailsPage(
-                        topic: topic,
-                        users: users,
-                        loggedInUser: widget.user,
+              ),
+            ),
+            // แสดงรายการหัวข้อที่กรองตามข้อความค้นหา
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredTopics.length,
+                itemBuilder: (context, index) {
+                  final topic = filteredTopics[index];
+                  final username = getUsernameById(
+                    topic['userId'],
+                  ); // Get username from userId
+
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 3.0,
+                    ), // กำหนด margin ด้านล่าง
+                    child: Card(
+                      color: Color(0xFF101010), // สีพื้นหลังของการ์ด
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          10,
+                        ), // มุมโค้งของการ์ด
+                        side: BorderSide(
+                          color: Colors.white,
+                          width: 2,
+                        ), // เพิ่มขอบสีขาว
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          topic['title'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18, // ทำให้ข้อความตัวหนา
+                            color: Colors.white, // สีข้อความ (text) เป็นสีขาว
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              topic['content'],
+                              style: TextStyle(
+                                color:
+                                    Colors.white, // สีข้อความ (text) เป็นสีขาว
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8.0,
+                              ), // กำหนด margin ด้านบน
+                              child: RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontFamily: 'MyCustomFont',
+                                    fontSize: 14,
+                                    color:
+                                        Colors
+                                            .white70, // สีข้อความ (text) เป็นสีเทาอ่อน
+                                  ),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: 'Posted by ',
+                                    ), // ข้อความแรกที่เป็นสีเทา
+                                    TextSpan(
+                                      text: '@$username', // Username
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(
+                                          0xFFA12C2C,
+                                        ), // สีแดงเข้ม (primary)
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          ' • ${timeAgo(topic['createdAt'])}', // เวลาที่โพสต์
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CustomPageRoute(
+                              page: TopicDetailsPage(
+                                topic: topic,
+                                users: users,
+                                loggedInUser: widget.user,
+                              ),
+                            ),
+                          );
+                        },
+                        trailing:
+                            widget.user['_id'] == topic['userId']
+                                ? PopupMenuButton<String>(
+                                  icon: Icon(
+                                    Icons.more_vert,
+                                    color: Colors.white,
+                                  ),
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      showEditDialog(
+                                        topic['_id'],
+                                        topic['title'],
+                                        topic['content'],
+                                      );
+                                    } else if (value == 'delete') {
+                                      deleteTopic(topic['_id']); // Delete topic
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      PopupMenuItem<String>(
+                                        value: 'edit',
+                                        child: Text(
+                                          'Edit',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'delete',
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ];
+                                  },
+                                )
+                                : null,
                       ),
                     ),
                   );
                 },
-                trailing:
-                    widget.user['_id'] == topic['userId']
-                        ? PopupMenuButton<String>(
-                          icon: Icon(Icons.more_vert),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              showEditDialog(
-                                topic['_id'],
-                                topic['title'],
-                                topic['content'],
-                              );
-                            } else if (value == 'delete') {
-                              deleteTopic(topic['_id']); // Delete topic
-                            }
-                          },
-                          itemBuilder: (BuildContext context) {
-                            return [
-                              PopupMenuItem<String>(
-                                value: 'edit',
-                                child: Text('Edit'),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'delete',
-                                child: Text('Delete'),
-                              ),
-                            ];
-                          },
-                        )
-                        : null,
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

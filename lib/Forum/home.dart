@@ -35,7 +35,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFFa12c2c),
         title: Text('Home'),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -45,6 +47,7 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+      backgroundColor: Color(0xFF101010),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start, // ให้เนื้อหาอยู่ด้านบน
@@ -60,7 +63,7 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
+                  color: Color(0xFFa12c2c),
                 ),
                 textAlign: TextAlign.left, // (ไม่จำเป็นแต่ใส่เพื่อความชัดเจน)
               ),
@@ -70,7 +73,7 @@ class HomePage extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'Press "Forum" to see what others are talking about, and press "Database" to view information about Valorant.',
-                style: TextStyle(fontSize: 15, color: Colors.black87),
+                style: TextStyle(fontSize: 15, color: Colors.white70),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -89,7 +92,7 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: Color(0xFFa12c2c),
                     ),
                   ),
                   SizedBox(height: 0), // ระยะห่างระหว่าง Heading กับ Subheading
@@ -97,7 +100,7 @@ class HomePage extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: 15), // Margin bottom 20
                     child: Text(
                       "Choose a page to continue", // Subheading
-                      style: TextStyle(fontSize: 16, color: Colors.black87),
+                      style: TextStyle(fontSize: 16, color: Colors.white70),
                     ),
                   ),
                 ],
@@ -144,7 +147,7 @@ class HomePage extends StatelessWidget {
     return SizedBox(
       width:
           MediaQuery.of(context).size.width, // กำหนดให้ปุ่มเป็นสี่เหลี่ยมจตุรัส
-      height: 70,
+      height: 50,
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(
@@ -153,6 +156,7 @@ class HomePage extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white, // ตั้งค่าสีพื้นหลังให้เป็นสีแดง
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20), // ทำให้มุมโค้งเล็กน้อย
           ),
@@ -163,12 +167,16 @@ class HomePage extends StatelessWidget {
           children: [
             Text(
               text,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF101010), // ตั้งสีข้อความให้เป็นสีดำ
+              ),
             ),
             SizedBox(width: 10), // ระยะห่างระหว่างข้อความและไอคอน
             Icon(
               icon, // ไอคอนที่ส่งมาจากการเรียกใช้
-              color: Colors.deepPurple,
+              color: Color(0xFFa12c2c),
             ),
           ],
         ),
@@ -200,7 +208,7 @@ class HomePage extends StatelessWidget {
                   ), // ใช้ CustomPageRoute ที่เราแก้ไขแล้ว
                 );
               },
-              child: Text('Logout', style: TextStyle(color: Colors.red)),
+              child: Text('Logout', style: TextStyle(color: Color(0xFFa12c2c))),
             ),
           ],
         );

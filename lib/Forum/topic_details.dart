@@ -9,7 +9,8 @@ class TopicDetailsPage extends StatefulWidget {
   final List<dynamic> users; // รับข้อมูล users
   final dynamic loggedInUser; // รับข้อมูลผู้ใช้ที่ล็อกอิน
 
-  TopicDetailsPage({
+  const TopicDetailsPage({
+    super.key,
     required this.topic,
     required this.users,
     required this.loggedInUser,
@@ -114,7 +115,14 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
     String username = getUsernameById(widget.topic['userId']);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.topic['title'])),
+      backgroundColor: Color(0xFF101010), // พื้นหลัง
+      appBar: AppBar(
+        title: Text(
+          widget.topic['title'],
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Color(0xFFA12C2C), // สีหลักของแถบแอพ
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -124,45 +132,65 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
               children: [
                 Text(
                   widget.topic['title'],
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
                 SizedBox(height: 16),
-                Text(widget.topic['content'], style: TextStyle(fontSize: 16)),
+                Text(
+                  widget.topic['content'],
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
                 SizedBox(height: 16),
-                RichText(
-                  text: TextSpan(
-                    text: 'Posted by ', // ข้อความแรกที่เป็นสีเทา
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                Text.rich(
+                  TextSpan(
+                    text: 'Posted by ',
+                    style: TextStyle(
+                      fontFamily: 'MyCustomFont',
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
                     children: <TextSpan>[
                       TextSpan(
-                        text:
-                            '@$username', // ข้อความ username ที่เป็นสี Deep Purple
+                        text: '@$username',
                         style: TextStyle(
+                          fontFamily: 'MyCustomFont',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Color(0xFFA12C2C), // สีหลักสำหรับ username
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 0),
                 Text(
-                  '${timeago.format(DateTime.parse(widget.topic['createdAt']), locale: 'en')}',
+                  timeago.format(
+                    DateTime.parse(widget.topic['createdAt']),
+                    locale: 'en',
+                  ),
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 SizedBox(height: 16),
-
-                // แสดงจำนวนคอมเมนต์
                 Text(
                   '${comments.length} Comments',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
                 SizedBox(height: 8),
-
                 comments.isEmpty
-                    ? Center(child: Text('No comments yet.'))
-                    : Container(
+                    ? Center(
+                      child: Text(
+                        'No comments yet.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                    : SizedBox(
                       height: MediaQuery.of(context).size.height * 0.5,
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -174,29 +202,26 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                           );
 
                           return Card(
-                            elevation: 2, // เพิ่มเงา (4 คือระดับความเข้มของเงา)
+                            elevation: 2,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                12,
-                              ), // ทำให้มุมโค้งมน
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(
-                                8.0,
-                              ), // เพิ่มระยะห่างข้างใน
+                              padding: const EdgeInsets.all(8.0),
                               child: ListTile(
                                 title: Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 4.0,
-                                  ), // เพิ่ม padding ด้านล่าง
+                                  padding: const EdgeInsets.only(bottom: 4.0),
                                   child: RichText(
                                     text: TextSpan(
                                       children: [
                                         TextSpan(
                                           text: '@$commenterUsername ',
                                           style: TextStyle(
+                                            fontFamily: 'MyCustomFont',
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.deepPurple,
+                                            color: Color(
+                                              0xFFA12C2C,
+                                            ), // สีหลักสำหรับ username
                                             fontSize: 16,
                                           ),
                                         ),
@@ -212,8 +237,9 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                   ? 'Now'
                                                   : '${timeago.format(DateTime.parse(comment['createdAt']), locale: 'en_short')} ago',
                                           style: TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.grey,
+                                            fontFamily: "MyCustomFont",
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF101010), // สีข้อคว
                                             fontSize: 14,
                                           ),
                                         ),
@@ -221,13 +247,25 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                     ),
                                   ),
                                 ),
-
-                                subtitle: Text(comment['content']),
+                                subtitle: Text(
+                                  comment['content'],
+                                  style: TextStyle(
+                                    color: Color(
+                                      0xFF101010,
+                                    ), // สีข้อความเป็นสีพื้นหลัง
+                                    fontWeight:
+                                        FontWeight
+                                            .bold, // ทำให้ข้อความเป็นตัวหนา
+                                  ),
+                                ), // สีข้อความในคอมเมนต์เป็นสีพื้นหลัง
                                 trailing:
                                     widget.loggedInUser['_id'] ==
                                             comment['userId']
                                         ? PopupMenuButton<String>(
-                                          icon: Icon(Icons.more_vert),
+                                          icon: Icon(
+                                            Icons.more_vert,
+                                            color: Color(0xFF101010),
+                                          ),
                                           onSelected: (value) {
                                             if (value == 'edit') {
                                               TextEditingController
@@ -235,12 +273,18 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                   TextEditingController(
                                                     text: comment['content'],
                                                   );
-
                                               showDialog(
                                                 context: context,
                                                 builder: (context) {
                                                   return AlertDialog(
-                                                    title: Text('Edit Comment'),
+                                                    title: Text(
+                                                      'Edit Comment',
+                                                      style: TextStyle(
+                                                        color: Color(
+                                                          0xFF101010,
+                                                        ),
+                                                      ),
+                                                    ),
                                                     content: TextField(
                                                       controller:
                                                           contentController,
@@ -248,7 +292,18 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                           InputDecoration(
                                                             labelText:
                                                                 "Content",
+                                                            labelStyle:
+                                                                TextStyle(
+                                                                  color: Color(
+                                                                    0xFF101010,
+                                                                  ),
+                                                                ),
                                                           ),
+                                                      style: TextStyle(
+                                                        color: Color(
+                                                          0xFF101010,
+                                                        ),
+                                                      ),
                                                     ),
                                                     actions: [
                                                       TextButton(
@@ -256,7 +311,14 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                             () => Navigator.pop(
                                                               context,
                                                             ),
-                                                        child: Text("Cancel"),
+                                                        child: Text(
+                                                          "Cancel",
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                              0xFF101010,
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
                                                       ElevatedButton(
                                                         onPressed: () {
@@ -270,6 +332,15 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                           );
                                                         },
                                                         child: Text("Save"),
+                                                        style:
+                                                            ElevatedButton.styleFrom(
+                                                              foregroundColor:
+                                                                  Colors.white,
+                                                              backgroundColor:
+                                                                  Color(
+                                                                    0xFFA12C2C,
+                                                                  ),
+                                                            ),
                                                       ),
                                                     ],
                                                   );
@@ -282,9 +353,19 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                   return AlertDialog(
                                                     title: Text(
                                                       'Are you sure?',
+                                                      style: TextStyle(
+                                                        color: Color(
+                                                          0xFF101010,
+                                                        ),
+                                                      ),
                                                     ),
                                                     content: Text(
                                                       'Do you really want to delete this comment?',
+                                                      style: TextStyle(
+                                                        color: Color(
+                                                          0xFF101010,
+                                                        ),
+                                                      ),
                                                     ),
                                                     actions: [
                                                       TextButton(
@@ -292,7 +373,14 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                             () => Navigator.pop(
                                                               context,
                                                             ),
-                                                        child: Text('Cancel'),
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                              0xFF101010,
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
                                                       ElevatedButton(
                                                         onPressed: () {
@@ -304,6 +392,15 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                                           );
                                                         },
                                                         child: Text('Delete'),
+                                                        style:
+                                                            ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  Color(
+                                                                    0xFFA12C2C,
+                                                                  ),
+                                                              foregroundColor:
+                                                                  Colors.white,
+                                                            ),
                                                       ),
                                                     ],
                                                   );
@@ -315,11 +412,21 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                                               (context) => [
                                                 PopupMenuItem<String>(
                                                   value: 'edit',
-                                                  child: Text('Edit'),
+                                                  child: Text(
+                                                    'Edit',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF101010),
+                                                    ),
+                                                  ),
                                                 ),
                                                 PopupMenuItem<String>(
                                                   value: 'delete',
-                                                  child: Text('Delete'),
+                                                  child: Text(
+                                                    'Delete',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF101010),
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                         )
@@ -338,11 +445,27 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
-                controller: contentController, // ใส่ controller สำหรับช่องกรอก
+                controller: contentController,
                 decoration: InputDecoration(
                   labelText: 'Add a comment',
-                  filled: true, // เปิดใช้งานการเติมสีพื้นหลัง
+                  labelStyle: TextStyle(color: Colors.white),
+                  filled: true,
+                  fillColor: Color(0xFF101010),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xFFA12C2C),
+                      width: 2,
+                    ), // เปลี่ยนสีเส้นขอบเป็นสีแดง
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.white,
+                      width: 1,
+                    ), // สีเส้นขอบปกติ
+                  ),
                 ),
+                style: TextStyle(color: Colors.white),
+                cursorColor: Colors.white, // ตั้งสีของ cursor เป็นสีแดง
                 onSubmitted: (value) {
                   if (value.isNotEmpty) {
                     addComment(value);

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'teams.dart';
 import 'players.dart';
 import 'matches.dart';
+import '../custom_page_route.dart';
 
 class ValorantDatabasePage extends StatefulWidget {
   const ValorantDatabasePage({super.key});
@@ -64,172 +65,128 @@ class _ValorantDatabasePageState extends State<ValorantDatabasePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Valorant Database')),
+      backgroundColor: Color(0xFF101010), // สีพื้นหลัง
+      appBar: AppBar(
+        backgroundColor: Color(0xFFA12C2C),
+        title: Text(
+          'Valorant Database',
+          style: TextStyle(color: Colors.white), // สีข้อความบน AppBar
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ), // สีของปุ่ม back หรือ icons
+        elevation: 0,
+      ),
       body: Center(
         child:
-            isLoading // เช็คสถานะการโหลด
-                ? CircularProgressIndicator() // แสดงตัวโหลดระหว่างที่ยังโหลดข้อมูล
+            isLoading
+                ? CircularProgressIndicator(color: Color(0xFFA12C2C)) // สีโหลด
                 : Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(height: 35),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Valorant Database Page',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepPurple,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ), // เพิ่ม padding x
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Valorant Database Page',
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFA12C2C),
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8), // เว้นช่องว่างระหว่างสองข้อความ
-                        Text(
-                          "Explore all the detailed statistics and player data.",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black54, // สีที่ไม่ฉูดฉาดเกินไป
+                          SizedBox(height: 8),
+                          Text(
+                            "Explore all the detailed statistics and player data.",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white70,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    // ปุ่ม Teams
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(
-                            double.infinity,
-                            70,
-                          ), // กำหนดให้ปุ่มยาวเต็มจอ
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamsPage(teams: teams),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Teams',
-                              style: TextStyle(
-                                fontSize: 20, // กำหนดขนาดตัวอักษรเป็น 20
-                                color:
-                                    Colors
-                                        .deepPurple, // สีตัวอักษรเป็น deep purple
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ), // ระยะห่างระหว่างข้อความและไอคอน
-                            Icon(
-                              Icons.group,
-                              color:
-                                  Colors.deepPurple, // สีไอคอนเป็น deep purple
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
+
                     SizedBox(height: 20),
-                    // ปุ่ม Players
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(
-                            double.infinity,
-                            70,
-                          ), // กำหนดให้ปุ่มยาวเต็มจอ
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => PlayersPage(players: players),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Players',
-                              style: TextStyle(
-                                fontSize: 20, // กำหนดขนาดตัวอักษรเป็น 20
-                                color:
-                                    Colors
-                                        .deepPurple, // สีตัวอักษรเป็น deep purple
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ), // ระยะห่างระหว่างข้อความและไอคอน
-                            Icon(
-                              Icons.person,
-                              color:
-                                  Colors.deepPurple, // สีไอคอนเป็น deep purple
-                            ),
-                          ],
-                        ),
-                      ),
+
+                    // Button - Teams
+                    _buildButton(
+                      label: "Teams",
+                      icon: Icons.group,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CustomPageRoute(page: TeamsPage(teams: teams)),
+                        );
+                      },
                     ),
                     SizedBox(height: 20),
-                    // ปุ่ม Matches
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(
-                            double.infinity,
-                            70,
-                          ), // กำหนดให้ปุ่มยาวเต็มจอ
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => MatchesPage(matches: matches),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Matches',
-                              style: TextStyle(
-                                fontSize: 20, // กำหนดขนาดตัวอักษรเป็น 20
-                                color:
-                                    Colors
-                                        .deepPurple, // สีตัวอักษรเป็น deep purple
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ), // ระยะห่างระหว่างข้อความและไอคอน
-                            Icon(
-                              Icons.sports_esports,
-                              color:
-                                  Colors.deepPurple, // สีไอคอนเป็น deep purple
-                            ),
-                          ],
-                        ),
-                      ),
+
+                    // Button - Players
+                    _buildButton(
+                      label: "Players",
+                      icon: Icons.person,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CustomPageRoute(page: PlayersPage(players: players)),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 20),
+
+                    // Button - Matches
+                    _buildButton(
+                      label: "Matches",
+                      icon: Icons.sports_esports,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CustomPageRoute(page: MatchesPage(matches: matches)),
+                        );
+                      },
                     ),
                   ],
                 ),
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          minimumSize: Size(double.infinity, 60),
+          backgroundColor: Colors.white, // พื้นหลังปุ่มเป็นขาว
+          foregroundColor: Color(0xFFA12C2C), // สีเมื่อกดปุ่ม
+          elevation: 5,
+        ),
+        onPressed: onTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 20,
+                color: Color(0xFF101010), // สีตัวหนังสือ
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 10),
+            Icon(icon, color: Color(0xFFA12C2C)),
+          ],
+        ),
       ),
     );
   }

@@ -8,7 +8,12 @@ class MatchesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Matches')),
+      backgroundColor: Color(0xFF101010), // เปลี่ยนสีพื้นหลัง
+      appBar: AppBar(
+        title: Text('Matches'),
+        backgroundColor: Color(0xFFA12C2C),
+        foregroundColor: Colors.white, // สีของ AppBar
+      ),
       body: ListView.builder(
         itemCount: matches.length,
         itemBuilder: (context, index) {
@@ -19,7 +24,12 @@ class MatchesPage extends StatelessWidget {
 
           return Card(
             margin: EdgeInsets.all(10),
-            elevation: 4,
+            elevation: 3, // เพิ่มเงาของ Card
+            color: Color(0xFF202020), // เปลี่ยนสีของ Card
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // เพิ่มมุมมนให้กับ Card
+            ),
+            shadowColor: Colors.black.withOpacity(0.5), // ปรับสีเงาของ Card
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -28,7 +38,11 @@ class MatchesPage extends StatelessWidget {
                   // แสดงชื่อ Tournament และ Event
                   Text(
                     '${match['tournament']} - ${match['event']}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   SizedBox(height: 8),
 
@@ -45,10 +59,24 @@ class MatchesPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
-                            Text('Country: ${team1['country']}'),
-                            Text('Score: ${team1['score']}'),
+                            Text(
+                              'Country: ${team1['country']}',
+                              style: TextStyle(color: Colors.grey[400]),
+                            ),
+                            // แสดง Score และใช้เครื่องหมายลบถ้าไม่มีค่า
+                            Text(
+                              'Score: ${team1['score'] ?? "-"}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(
+                                  0xFFA12C2C,
+                                ), // ใช้สีที่ทำให้ชัดขึ้น
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -63,10 +91,22 @@ class MatchesPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
-                            Text('Country: ${team2['country']}'),
-                            Text('Score: ${team2['score']}'),
+                            Text(
+                              'Country: ${team2['country']}',
+                              style: TextStyle(color: Colors.grey[400]),
+                            ),
+                            // แสดง Score และใช้เครื่องหมายลบถ้าไม่มีค่า
+                            Text(
+                              'Score: ${team2['score'] ?? "-"}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber, // ใช้สีที่ทำให้ชัดขึ้น
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -75,20 +115,25 @@ class MatchesPage extends StatelessWidget {
                   SizedBox(height: 8),
 
                   // แสดงสถานะของการแข่งขัน
-                  Text('Status: ${match['status']}'),
+                  Text(
+                    'Status: ${match['status']}',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   SizedBox(height: 8),
 
                   // แสดงรูปภาพของการแข่งขัน
                   Image.network(
                     'https://cors-anywhere.herokuapp.com/' + match['img'],
                     height: 50,
-
                     fit: BoxFit.cover,
                   ),
                   SizedBox(height: 8),
 
                   // แสดงวันที่และเวลา
-                  Text('Date: ${match['utcDate']}'),
+                  Text(
+                    'Date: ${match['utcDate']}',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
             ),
