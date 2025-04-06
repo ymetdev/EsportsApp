@@ -288,7 +288,17 @@ class _ForumPageState extends State<ForumPage> {
         title: Text('Forum'),
         foregroundColor: Colors.white,
         backgroundColor: Color(0xFFA12C2C), // สีหลัก (primary)
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add), // ใช้ไอคอน "+" สำหรับการเพิ่มโพสต์
+            onPressed: () {
+              // เรียกใช้ฟังก์ชันการแสดง dialog สร้างโพสต์ใหม่
+              showCreateTopicDialog();
+            },
+          ),
+        ],
       ),
+
       body: Container(
         color: Color(0xFF101010), // สีพื้นหลัง (background)
         child: Column(
@@ -344,16 +354,16 @@ class _ForumPageState extends State<ForumPage> {
                       bottom: 3.0,
                     ), // กำหนด margin ด้านล่าง
                     child: Card(
-                      color: Color(0xFF101010), // สีพื้นหลังของการ์ด
+                      color: Color(0xFF202020), // สีพื้นหลังของการ์ด
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
-                          10,
+                          15,
                         ), // มุมโค้งของการ์ด
-                        side: BorderSide(
-                          color: Colors.white,
-                          width: 2,
-                        ), // เพิ่มขอบสีขาว
                       ),
+                      elevation: 5, // เพิ่มเงาให้กับการ์ด
+                      shadowColor: Colors.black.withOpacity(
+                        0.5,
+                      ), // ปรับสีของเงา
                       child: ListTile(
                         title: Text(
                           topic['title'],

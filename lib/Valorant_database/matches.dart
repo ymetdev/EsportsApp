@@ -72,9 +72,7 @@ class MatchesPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(
-                                  0xFFA12C2C,
-                                ), // ใช้สีที่ทำให้ชัดขึ้น
+                                color: Colors.amber, // ใช้สีที่ทำให้ชัดขึ้น
                               ),
                             ),
                           ],
