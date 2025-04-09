@@ -17,7 +17,7 @@ class ForumPage extends StatefulWidget {
 class _ForumPageState extends State<ForumPage> {
   List<dynamic> topics = [];
   List<dynamic> users = []; // List to store users
-  TextEditingController _searchController =
+  final TextEditingController _searchController =
       TextEditingController(); // ควบคุมการพิมพ์ในช่องค้นหา
   List<dynamic> filteredTopics = []; // เก็บผลลัพธ์ที่ค้นหาจากข้อความ
 
@@ -206,10 +206,10 @@ class _ForumPageState extends State<ForumPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.black, // พื้นหลังสีดำ
               ),
+              child: Text("Cancel"),
             ),
             ElevatedButton(
               onPressed: () {
@@ -220,11 +220,11 @@ class _ForumPageState extends State<ForumPage> {
                 );
                 Navigator.pop(context);
               },
-              child: Text("Save"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFA12C2C), // พื้นหลังสีแดง (สีหลัก)
                 foregroundColor: Colors.white, // ตัวอักษรเป็นสีขาว
               ),
+              child: Text("Save"),
             ),
           ],
         );
@@ -257,23 +257,23 @@ class _ForumPageState extends State<ForumPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
               style: TextButton.styleFrom(
                 foregroundColor: Color(0xFF101010), // ตัวอักษรเป็นสีขาว
               ),
+              child: Text("Cancel"),
             ),
             ElevatedButton(
               onPressed: () {
                 createTopic(titleController.text, contentController.text);
                 Navigator.pop(context);
               },
-              child: Text("Create"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(
                   0xFFA12C2C,
                 ), // พื้นหลังปุ่มเป็นสี primary
                 foregroundColor: Colors.white, // ตัวอักษรเป็นสีขาว
               ),
+              child: Text("Create"),
             ),
           ],
         );
@@ -306,7 +306,7 @@ class _ForumPageState extends State<ForumPage> {
             // ช่องค้นหาที่อยู่ข้างบนก่อนการแสดงผลรายการ
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 child: TextField(
                   controller: _searchController,
